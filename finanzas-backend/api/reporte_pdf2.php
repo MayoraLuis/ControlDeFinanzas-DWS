@@ -8,76 +8,147 @@ require_once __DIR__ . '/../config/conexion.php';
 $db = new Conexion();
 $conn = $db->conectar();
 
-$entradas = $conn->query("SELECT SUM(monto) AS total FROM entradas")->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
-$salidas = $conn->query("SELECT SUM(monto) AS total FROM salidas")->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
-$balance = $entradas - $salidas;
+$totalEntradas = $conn->query("SELECT SUM(monto) AS total FROM entradas")
+    ->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+$totalSalidas = $conn->query("SELECT SUM(monto) AS total FROM salidas")
+    ->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+$balance = $totalEntradas - $totalSalidas;
+
+$entradas = $conn->query("SELECT * FROM entradas ORDER BY fecha DESC");
+$salidas = $conn->query("SELECT * FROM salidas ORDER BY fecha DESC");
+
+$fechaActual = date("d/m/Y");
 
 $html = "
 <style>
-body { font-family: Arial, sans-serif; }
-h1 { text-align: center; color: #222; }
-.resumen { margin-bottom: 20px; }
-table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-th { background-color: #f2f2f2; }
-th, td { border: 1px solid #999; padding: 8px; text-align: left; }
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+.contenedor {
+    border: 2px solid #9ec5fe;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+h1, h2, h3 {
+    text-align: center;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+}
+
+th, td {
+    border: 1px solid #999;
+    padding: 6px;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.columnas {
+    width: 100%;
+}
+
+.col {
+    width: 49%;
+    vertical-align: top;
+    display: inline-block;
+}
+
+.balance {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.resumen {
+    text-align: center;
+    margin-bottom: 10px;
+}
 </style>
 
-<h1>Reporte de Finanzas</h1>
+<div class='contenedor'>
+    <h2>Reporte Mensual de Finanzas</h2>
+    <p class='resumen'><strong>Fecha del reporte:</strong> $fechaActual</p>
 
-<div class='resumen'>
-<p><strong>Total Entradas:</strong> $$entradas</p>
-<p><strong>Total Salidas:</strong> $$salidas</p>
-<p><strong>Balance:</strong> $$balance</p>
-</div>
+    <div class='columnas'>
+        <div class='col'>
+            <h3>Entradas</h3>
+            <table>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Monto</th>
+                </tr>";
 
-<h3>Entradas</h3>
-<table>
-<tr>
-<th>Tipo</th>
-<th>Monto</th>
-<th>Fecha</th>
-</tr>
-";
-
-$result = $conn->query("SELECT * FROM entradas");
-
-foreach ($result as $row) {
+foreach ($entradas as $row) {
     $html .= "
-    <tr>
-        <td>{$row['tipo_entrada']}</td>
-        <td>{$row['monto']}</td>
-        <td>{$row['fecha']}</td>
-    </tr>";
+                <tr>
+                    <td>{$row['tipo_entrada']}</td>
+                    <td>$" . number_format($row['monto'], 2) . "</td>
+                </tr>";
 }
 
 $html .= "
-</table>
+                <tr>
+                    <th>TOTAL</th>
+                    <th>$" . number_format($totalEntradas, 2) . "</th>
+                </tr>
+            </table>
+        </div>
 
-<h3>Salidas</h3>
-<table>
-<tr>
-<th>Tipo</th>
-<th>Monto</th>
-<th>Fecha</th>
-</tr>
-";
+        <div class='col'>
+            <h3>Salidas</h3>
+            <table>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Monto</th>
+                </tr>";
 
-$result2 = $conn->query("SELECT * FROM salidas");
-
-foreach ($result2 as $row) {
+foreach ($salidas as $row) {
     $html .= "
-    <tr>
-        <td>{$row['tipo_salida']}</td>
-        <td>{$row['monto']}</td>
-        <td>{$row['fecha']}</td>
-    </tr>";
+                <tr>
+                    <td>{$row['tipo_salida']}</td>
+                    <td>$" . number_format($row['monto'], 2) . "</td>
+                </tr>";
 }
 
-$html .= "</table>";
+$html .= "
+                <tr>
+                    <th>TOTAL</th>
+                    <th>$" . number_format($totalSalidas, 2) . "</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <p class='balance'>Balance Mensual: $" . number_format($balance, 2) . "</p>
+</div>
+
+<div class='contenedor'>
+    <h2>Gráfico de balance mensual Entradas vs Salidas</h2>
+    <p style='text-align:center;'>
+        Entradas: $" . number_format($totalEntradas, 2) . " |
+        Salidas: $" . number_format($totalSalidas, 2) . "
+    </p>
+    <p style='text-align:center;'>
+        El gráfico de pastel se visualiza dentro del sistema web en la sección Balance.
+    </p>
+</div>
+";
 
 $dompdf = new Dompdf();
 $dompdf->loadHtml($html);
 $dompdf->setPaper("A4", "portrait");
 $dompdf->render();
-$dompdf->stream("reporte_finanzas.pdf", ["Attachment" => false]);
+
+$fecha = date("Y-m-d");
+$dompdf->stream("reporte_finanzas_$fecha.pdf", ["Attachment" => false]);
 ?>

@@ -1,0 +1,14 @@
+# React
+finanzas-frontend/node_modules/
+finanzas-frontend/dist/
+
+# Composer / PHP
+finanzas-backend/vendor/
+
+# Archivos temporales
+*.log
+.DS_Store
+Thumbs.db
+
+# Variables de entorno
+.env

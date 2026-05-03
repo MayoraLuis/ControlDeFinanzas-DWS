@@ -245,3 +245,392 @@ p {
     font-size: 1.6rem;
   }
 }
+
+
+.img-factura {
+  width: 65px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.img-factura:hover {
+  transform: scale(2.1);
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.modal-factura-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(17, 24, 39, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeInFactura 0.25s ease;
+  padding: 20px;
+}
+
+.modal-factura-contenido {
+  background: #ffffff;
+  border-radius: 18px;
+  max-width: 850px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  padding: 18px;
+  animation: zoomInFactura 0.25s ease;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.modal-factura-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-factura-header h5 {
+  margin: 0;
+}
+
+.modal-factura-img {
+  width: 100%;
+  border-radius: 14px;
+  display: block;
+}
+
+@keyframes fadeInFactura {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zoomInFactura {
+  from {
+    transform: scale(0.88);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.powerbi-layout {
+  display: flex;
+  min-height: calc(100vh - 70px);
+  background: #eef2f7;
+}
+
+.powerbi-sidebar {
+  width: 250px;
+  background: #111827;
+  color: white;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.powerbi-sidebar h4 {
+  color: white;
+  margin-bottom: 28px;
+}
+
+.sidebar-item {
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.sidebar-item:hover,
+.sidebar-item.active {
+  background: #2563eb;
+  color: white;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  color: #9ca3af;
+}
+
+.powerbi-content {
+  flex: 1;
+  padding: 28px;
+}
+
+.powerbi-header {
+  background: white;
+  border-radius: 20px;
+  padding: 22px;
+  margin-bottom: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.powerbi-header h2 {
+  margin: 0;
+}
+
+.powerbi-header p {
+  margin: 6px 0 0;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.kpi-card {
+  color: white;
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.13);
+}
+
+.kpi-card span {
+  opacity: 0.9;
+}
+
+.kpi-card h3 {
+  color: white;
+  margin-top: 12px;
+}
+
+.kpi-blue {
+  background: linear-gradient(135deg, #0d6efd, #60a5fa);
+}
+
+.kpi-red {
+  background: linear-gradient(135deg, #dc3545, #fb7185);
+}
+
+.kpi-green {
+  background: linear-gradient(135deg, #198754, #4ade80);
+}
+
+.report-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.tables-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.report-card {
+  background: white;
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.chart-card {
+  min-height: 420px;
+}
+
+.balance-text {
+  color: #6b7280;
+  margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .powerbi-layout {
+    flex-direction: column;
+  }
+
+  .powerbi-sidebar {
+    width: 100%;
+  }
+
+  .kpi-grid,
+  .report-grid,
+  .tables-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .powerbi-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+.home-dashboard {
+  padding: 28px;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.home-hero {
+  background: linear-gradient(135deg, #111827 0%, #2563eb 100%);
+  color: white;
+  border-radius: 28px;
+  padding: 34px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  box-shadow: 0 18px 45px rgba(37, 99, 235, 0.28);
+  margin-bottom: 24px;
+}
+
+.home-hero h1,
+.home-hero p {
+  color: white;
+}
+
+.home-hero h1 {
+  margin-top: 12px;
+  font-size: 2.1rem;
+}
+
+.home-badge {
+  background: rgba(255, 255, 255, 0.18);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.home-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.home-kpi-card {
+  color: white;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.13);
+}
+
+.home-kpi-card span {
+  opacity: 0.92;
+  font-weight: 700;
+}
+
+.home-kpi-card h2 {
+  color: white;
+  margin: 12px 0;
+  font-size: 2rem;
+}
+
+.home-kpi-card p {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.kpi-income {
+  background: linear-gradient(135deg, #198754 0%, #22c55e 100%);
+}
+
+.kpi-expense {
+  background: linear-gradient(135deg, #dc3545 0%, #fb7185 100%);
+}
+
+.kpi-final {
+  background: linear-gradient(135deg, #0d6efd 0%, #60a5fa 100%);
+}
+
+.home-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.home-panel {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.home-panel h4 {
+  margin-bottom: 18px;
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.quick-btn {
+  border: none;
+  border-radius: 16px;
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  color: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quick-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
+}
+
+.quick-btn span {
+  margin-right: 8px;
+}
+
+.quick-btn.green {
+  background: #198754;
+}
+
+.quick-btn.red {
+  background: #dc3545;
+}
+
+.quick-btn.blue {
+  background: #0d6efd;
+}
+
+.quick-btn.orange {
+  background: #f59e0b;
+}
+
+.quick-btn.dark {
+  background: #111827;
+}
+
+.home-chart {
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .home-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .home-kpi-grid,
+  .home-main-grid {
+    grid-template-columns: 1fr;
+  }
+}

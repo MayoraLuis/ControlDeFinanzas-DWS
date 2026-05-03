@@ -9,6 +9,7 @@ import Balance from "./pages/Balance";
 import RutaPrivada from "./components/RutaPrivada";
 import Registro from "./pages/Registro";
 
+
 function App() {
   return (
     <BrowserRouter>
@@ -70,6 +71,7 @@ function App() {
         />
 
         <Route path="/registro" element={<Registro />} />
+
       </Routes>
     </BrowserRouter>
   );

@@ -7,25 +7,25 @@ require_once __DIR__ . '/../config/conexion.php';
 $db = new Conexion();
 $conn = $db->conectar();
 
-// Total entradas
-$sql1 = "SELECT SUM(monto) as total_entradas FROM entradas";
-$stmt1 = $conn->prepare($sql1);
-$stmt1->execute();
-$entradas = $stmt1->fetch(PDO::FETCH_ASSOC);
+$entradasStmt = $conn->query("SELECT * FROM entradas ORDER BY fecha DESC");
+$entradas = $entradasStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Total salidas
-$sql2 = "SELECT SUM(monto) as total_salidas FROM salidas";
-$stmt2 = $conn->prepare($sql2);
-$stmt2->execute();
-$salidas = $stmt2->fetch(PDO::FETCH_ASSOC);
+$salidasStmt = $conn->query("SELECT * FROM salidas ORDER BY fecha DESC");
+$salidas = $salidasStmt->fetchAll(PDO::FETCH_ASSOC);
 
-$totalEntradas = $entradas['total_entradas'] ?? 0;
-$totalSalidas = $salidas['total_salidas'] ?? 0;
+$totalEntradas = $conn->query("SELECT SUM(monto) AS total FROM entradas")
+    ->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+$totalSalidas = $conn->query("SELECT SUM(monto) AS total FROM salidas")
+    ->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
 $balance = $totalEntradas - $totalSalidas;
 
 echo json_encode([
     "total_entradas" => $totalEntradas,
     "total_salidas" => $totalSalidas,
-    "balance" => $balance
+    "balance" => $balance,
+    "entradas" => $entradas,
+    "salidas" => $salidas
 ]);
 ?>
