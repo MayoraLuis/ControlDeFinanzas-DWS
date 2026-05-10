@@ -4,20 +4,45 @@ header("Content-Type: application/json");
 
 require_once __DIR__ . '/../config/conexion.php';
 
+$usuario_id = $_GET["usuario_id"] ?? null;
+
+if (!$usuario_id) {
+    echo json_encode([
+        "total_entradas" => 0,
+        "total_salidas" => 0,
+        "balance" => 0,
+        "entradas" => [],
+        "salidas" => []
+    ]);
+    exit;
+}
+
 $db = new Conexion();
 $conn = $db->conectar();
 
-$entradasStmt = $conn->query("SELECT * FROM entradas ORDER BY fecha DESC");
-$entradas = $entradasStmt->fetchAll(PDO::FETCH_ASSOC);
+$sqlEntradas = "SELECT * FROM entradas WHERE usuario_id = :usuario_id ORDER BY fecha DESC";
+$stmtEntradas = $conn->prepare($sqlEntradas);
+$stmtEntradas->bindParam(":usuario_id", $usuario_id);
+$stmtEntradas->execute();
+$entradas = $stmtEntradas->fetchAll(PDO::FETCH_ASSOC);
 
-$salidasStmt = $conn->query("SELECT * FROM salidas ORDER BY fecha DESC");
-$salidas = $salidasStmt->fetchAll(PDO::FETCH_ASSOC);
+$sqlSalidas = "SELECT * FROM salidas WHERE usuario_id = :usuario_id ORDER BY fecha DESC";
+$stmtSalidas = $conn->prepare($sqlSalidas);
+$stmtSalidas->bindParam(":usuario_id", $usuario_id);
+$stmtSalidas->execute();
+$salidas = $stmtSalidas->fetchAll(PDO::FETCH_ASSOC);
 
-$totalEntradas = $conn->query("SELECT SUM(monto) AS total FROM entradas")
-    ->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+$sqlTotalEntradas = "SELECT SUM(monto) AS total FROM entradas WHERE usuario_id = :usuario_id";
+$stmtTotalEntradas = $conn->prepare($sqlTotalEntradas);
+$stmtTotalEntradas->bindParam(":usuario_id", $usuario_id);
+$stmtTotalEntradas->execute();
+$totalEntradas = $stmtTotalEntradas->fetch(PDO::FETCH_ASSOC)["total"] ?? 0;
 
-$totalSalidas = $conn->query("SELECT SUM(monto) AS total FROM salidas")
-    ->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+$sqlTotalSalidas = "SELECT SUM(monto) AS total FROM salidas WHERE usuario_id = :usuario_id";
+$stmtTotalSalidas = $conn->prepare($sqlTotalSalidas);
+$stmtTotalSalidas->bindParam(":usuario_id", $usuario_id);
+$stmtTotalSalidas->execute();
+$totalSalidas = $stmtTotalSalidas->fetch(PDO::FETCH_ASSOC)["total"] ?? 0;
 
 $balance = $totalEntradas - $totalSalidas;
 

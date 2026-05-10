@@ -3,6 +3,7 @@ import api from "../services/api";
 import Navbar from "../components/Navbar";
 import BotonRegresar from "../components/BotonRegresar";
 import { Pie } from "react-chartjs-2";
+
 import {
   Chart as ChartJS,
   ArcElement,
@@ -10,9 +11,16 @@ import {
   Legend
 } from "chart.js";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend
+);
 
 function Balance() {
+
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
   const [datos, setDatos] = useState({
     total_entradas: 0,
     total_salidas: 0,
@@ -26,16 +34,34 @@ function Balance() {
   }, []);
 
   const cargarBalance = async () => {
-    const response = await api.get("/balance.php");
-    setDatos(response.data);
+
+    try {
+
+      const response = await api.get(
+        `/balance.php?usuario_id=${usuario.id}`
+      );
+
+      setDatos(response.data);
+
+    } catch (error) {
+
+      console.error("Error balance:", error);
+
+    }
   };
 
   const dataChart = {
     labels: ["Entradas", "Salidas"],
     datasets: [
       {
-        data: [Number(datos.total_entradas), Number(datos.total_salidas)],
-        backgroundColor: ["#0d6efd", "#dc3545"],
+        data: [
+          Number(datos.total_entradas),
+          Number(datos.total_salidas)
+        ],
+        backgroundColor: [
+          "#198754",
+          "#dc3545"
+        ],
         borderWidth: 1
       }
     ]
@@ -45,120 +71,76 @@ function Balance() {
     <>
       <Navbar />
 
-      <div className="powerbi-layout">
-        <aside className="powerbi-sidebar">
-          <h4>📊 Reportes</h4>
+      <div className="container mt-4">
 
-          <div className="sidebar-item active">Balance general</div>
-          <div className="sidebar-item">Entradas</div>
-          <div className="sidebar-item">Salidas</div>
-          <div className="sidebar-item">PDF</div>
+        <BotonRegresar />
 
-          <div className="sidebar-footer">
-            <small>Control de Finanzas</small>
-          </div>
-        </aside>
+        <div className="section-card">
 
-        <main className="powerbi-content">
-          <BotonRegresar />
+          <h2 className="mb-4">
+            Balance General
+          </h2>
 
-          <div className="powerbi-header">
-            <div>
-              <h2>Reporte Financiero</h2>
-              <p>Resumen general de entradas, salidas y balance.</p>
-            </div>
+          <div className="row g-3">
 
-            <a
-              href="http://localhost/controlFinanzas/finanzas-backend/api/reporte_pdf2.php"
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn-dark"
-            >
-              Exportar PDF
-            </a>
-          </div>
-
-          <div className="kpi-grid">
-            <div className="kpi-card kpi-blue">
-              <span>Total Entradas</span>
-              <h3>${Number(datos.total_entradas).toFixed(2)}</h3>
-            </div>
-
-            <div className="kpi-card kpi-red">
-              <span>Total Salidas</span>
-              <h3>${Number(datos.total_salidas).toFixed(2)}</h3>
-            </div>
-
-            <div className="kpi-card kpi-green">
-              <span>Balance Final</span>
-              <h3>${Number(datos.balance).toFixed(2)}</h3>
-            </div>
-          </div>
-
-          <div className="report-grid">
-            <div className="report-card chart-card">
-              <h5>Entradas vs Salidas</h5>
-              <div style={{ maxWidth: "360px", margin: "0 auto" }}>
-                <Pie data={dataChart} />
+            <div className="col-md-4">
+              <div className="alert alert-success shadow-sm">
+                <strong>Entradas:</strong>
+                <br />
+                ${Number(datos.total_entradas).toFixed(2)}
               </div>
             </div>
 
-            <div className="report-card">
-              <h5>Resumen del Balance</h5>
-              <p className="balance-text">
-                El balance actual es de:
-              </p>
-              <h2 className={datos.balance >= 0 ? "text-success" : "text-danger"}>
+            <div className="col-md-4">
+              <div className="alert alert-danger shadow-sm">
+                <strong>Salidas:</strong>
+                <br />
+                ${Number(datos.total_salidas).toFixed(2)}
+              </div>
+            </div>
+
+            <div className="col-md-4">
+              <div className="alert alert-primary shadow-sm">
+                <strong>Balance:</strong>
+                <br />
                 ${Number(datos.balance).toFixed(2)}
-              </h2>
-              <p className="text-muted">
-                Calculado como total de entradas menos total de salidas.
-              </p>
-            </div>
-          </div>
-
-          <div className="tables-grid">
-            <div className="report-card">
-              <h5>Entradas</h5>
-              <table className="table table-sm table-bordered">
-                <thead>
-                  <tr>
-                    <th>Tipo</th>
-                    <th>Monto</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {datos.entradas.map((e) => (
-                    <tr key={e.id}>
-                      <td>{e.tipo_entrada}</td>
-                      <td>${Number(e.monto).toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              </div>
             </div>
 
-            <div className="report-card">
-              <h5>Salidas</h5>
-              <table className="table table-sm table-bordered">
-                <thead>
-                  <tr>
-                    <th>Tipo</th>
-                    <th>Monto</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {datos.salidas.map((s) => (
-                    <tr key={s.id}>
-                      <td>{s.tipo_salida}</td>
-                      <td>${Number(s.monto).toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </div>
-        </main>
+
+          <div className="card shadow mt-4 p-4">
+
+            <h4 className="text-center mb-4">
+              Relación Entradas vs Salidas
+            </h4>
+
+            <div
+              style={{
+                maxWidth: "420px",
+                margin: "0 auto"
+              }}
+            >
+              <Pie data={dataChart} />
+            </div>
+
+            <div className="text-center mt-4">
+
+              <a
+                href={`http://localhost/controlFinanzas/finanzas-backend/api/reporte_pdf2.php?usuario_id=${usuario.id}`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-dark"
+              >
+                Exportar a PDF
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
     </>
   );

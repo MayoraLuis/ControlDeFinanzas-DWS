@@ -5,20 +5,36 @@ use Dompdf\Dompdf;
 
 require_once __DIR__ . '/../config/conexion.php';
 
+$usuario_id = $_GET["usuario_id"] ?? null;
+
+if (!$usuario_id) {
+    die("Usuario no recibido");
+}
+
 $db = new Conexion();
 $conn = $db->conectar();
 
-$totalEntradas = $conn->query("SELECT SUM(monto) AS total FROM entradas")
-    ->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+$stmtEntradas = $conn->prepare("SELECT * FROM entradas WHERE usuario_id = :usuario_id ORDER BY fecha DESC");
+$stmtEntradas->bindParam(":usuario_id", $usuario_id);
+$stmtEntradas->execute();
+$entradas = $stmtEntradas->fetchAll(PDO::FETCH_ASSOC);
 
-$totalSalidas = $conn->query("SELECT SUM(monto) AS total FROM salidas")
-    ->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+$stmtSalidas = $conn->prepare("SELECT * FROM salidas WHERE usuario_id = :usuario_id ORDER BY fecha DESC");
+$stmtSalidas->bindParam(":usuario_id", $usuario_id);
+$stmtSalidas->execute();
+$salidas = $stmtSalidas->fetchAll(PDO::FETCH_ASSOC);
+
+$stmtTotalEntradas = $conn->prepare("SELECT SUM(monto) AS total FROM entradas WHERE usuario_id = :usuario_id");
+$stmtTotalEntradas->bindParam(":usuario_id", $usuario_id);
+$stmtTotalEntradas->execute();
+$totalEntradas = $stmtTotalEntradas->fetch(PDO::FETCH_ASSOC)["total"] ?? 0;
+
+$stmtTotalSalidas = $conn->prepare("SELECT SUM(monto) AS total FROM salidas WHERE usuario_id = :usuario_id");
+$stmtTotalSalidas->bindParam(":usuario_id", $usuario_id);
+$stmtTotalSalidas->execute();
+$totalSalidas = $stmtTotalSalidas->fetch(PDO::FETCH_ASSOC)["total"] ?? 0;
 
 $balance = $totalEntradas - $totalSalidas;
-
-$entradas = $conn->query("SELECT * FROM entradas ORDER BY fecha DESC");
-$salidas = $conn->query("SELECT * FROM salidas ORDER BY fecha DESC");
-
 $fechaActual = date("d/m/Y");
 
 $html = "
@@ -86,6 +102,7 @@ th {
                 <tr>
                     <th>Tipo</th>
                     <th>Monto</th>
+                    <th>Fecha</th>
                 </tr>";
 
 foreach ($entradas as $row) {
@@ -93,13 +110,14 @@ foreach ($entradas as $row) {
                 <tr>
                     <td>{$row['tipo_entrada']}</td>
                     <td>$" . number_format($row['monto'], 2) . "</td>
+                    <td>{$row['fecha']}</td>
                 </tr>";
 }
 
 $html .= "
                 <tr>
                     <th>TOTAL</th>
-                    <th>$" . number_format($totalEntradas, 2) . "</th>
+                    <th colspan='2'>$" . number_format($totalEntradas, 2) . "</th>
                 </tr>
             </table>
         </div>
@@ -110,6 +128,7 @@ $html .= "
                 <tr>
                     <th>Tipo</th>
                     <th>Monto</th>
+                    <th>Fecha</th>
                 </tr>";
 
 foreach ($salidas as $row) {
@@ -117,13 +136,14 @@ foreach ($salidas as $row) {
                 <tr>
                     <td>{$row['tipo_salida']}</td>
                     <td>$" . number_format($row['monto'], 2) . "</td>
+                    <td>{$row['fecha']}</td>
                 </tr>";
 }
 
 $html .= "
                 <tr>
                     <th>TOTAL</th>
-                    <th>$" . number_format($totalSalidas, 2) . "</th>
+                    <th colspan='2'>$" . number_format($totalSalidas, 2) . "</th>
                 </tr>
             </table>
         </div>
@@ -133,13 +153,10 @@ $html .= "
 </div>
 
 <div class='contenedor'>
-    <h2>Gráfico de balance mensual Entradas vs Salidas</h2>
+    <h2>Resumen</h2>
     <p style='text-align:center;'>
-        Entradas: $" . number_format($totalEntradas, 2) . " |
-        Salidas: $" . number_format($totalSalidas, 2) . "
-    </p>
-    <p style='text-align:center;'>
-        El gráfico de pastel se visualiza dentro del sistema web en la sección Balance.
+        Total entradas: $" . number_format($totalEntradas, 2) . " |
+        Total salidas: $" . number_format($totalSalidas, 2) . "
     </p>
 </div>
 ";

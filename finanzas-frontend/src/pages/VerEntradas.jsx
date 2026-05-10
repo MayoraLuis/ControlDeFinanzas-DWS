@@ -12,10 +12,12 @@ function VerEntradas() {
     cargarEntradas();
   }, []);
 
-  const cargarEntradas = async () => {
-    const res = await api.get("/obtener_entradas.php");
-    setEntradas(res.data);
-  };
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+const cargarEntradas = async () => {
+  const res = await api.get(`/obtener_entradas.php?usuario_id=${usuario.id}`);
+  setEntradas(res.data);
+};
 
   const eliminarEntrada = async (id) => {
     if (!confirm("¿Deseas eliminar esta entrada?")) return;

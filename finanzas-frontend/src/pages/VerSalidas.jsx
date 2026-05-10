@@ -12,10 +12,12 @@ function VerSalidas() {
     cargarSalidas();
   }, []);
 
-  const cargarSalidas = async () => {
-    const res = await api.get("/obtener_salidas.php");
-    setSalidas(res.data);
-  };
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+const cargarSalidas = async () => {
+  const res = await api.get(`/obtener_salidas.php?usuario_id=${usuario.id}`);
+  setSalidas(res.data);
+};
 
   const eliminarSalida = async (id) => {
     if (!confirm("¿Deseas eliminar esta salida?")) return;

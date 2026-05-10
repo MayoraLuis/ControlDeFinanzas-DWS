@@ -12,49 +12,114 @@ function RegistrarEntrada() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMensaje("");
+
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+    if (!usuario || !usuario.id) {
+      setMensaje("No se encontró el usuario logueado. Inicia sesión nuevamente.");
+      return;
+    }
+
+    if (!factura) {
+      setMensaje("Debes seleccionar una factura.");
+      return;
+    }
 
     const formData = new FormData();
+    formData.append("usuario_id", usuario.id);
     formData.append("tipo_entrada", tipo);
     formData.append("monto", monto);
     formData.append("fecha", fecha);
     formData.append("factura", factura);
 
-    const response = await api.post("/crear_entrada.php", formData);
+    try {
+      const response = await api.post("/crear_entrada.php", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    if (response.data.success) {
-      setMensaje("Entrada registrada correctamente");
+      if (response.data.success) {
+        setMensaje("Entrada registrada correctamente");
+        setTipo("");
+        setMonto("");
+        setFecha("");
+        setFactura(null);
+        e.target.reset();
+      } else {
+        setMensaje(response.data.message || "Error al guardar la entrada");
+      }
+    } catch (error) {
+      console.error(error);
+      setMensaje("Error al conectar con el servidor");
     }
   };
 
   return (
     <>
       <Navbar />
-       <div className="container mt-4">
-    <BotonRegresar />
 
-    <div className="section-card">
-      <h2 className="mb-4">Registrar Entrada</h2>
+      <div className="container mt-4">
+        <BotonRegresar />
 
-      {mensaje && <div className="alert alert-info">{mensaje}</div>}
-      
+        <div className="section-card">
+          <h2 className="mb-4">Registrar Entrada</h2>
 
-        <form onSubmit={handleSubmit}>
-          <input className="form-control mb-2" placeholder="Tipo"
-            value={tipo} onChange={(e) => setTipo(e.target.value)} />
+          {mensaje && <div className="alert alert-info">{mensaje}</div>}
 
-          <input type="number" className="form-control mb-2" placeholder="Monto"
-            value={monto} onChange={(e) => setMonto(e.target.value)} />
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label className="form-label">Tipo de entrada</label>
+              <input
+                type="text"
+                className="form-control"
+                value={tipo}
+                onChange={(e) => setTipo(e.target.value)}
+                required
+              />
+            </div>
 
-          <input type="date" className="form-control mb-2"
-            value={fecha} onChange={(e) => setFecha(e.target.value)} />
+            <div className="mb-3">
+              <label className="form-label">Monto</label>
+              <input
+                type="number"
+                step="0.01"
+                className="form-control"
+                value={monto}
+                onChange={(e) => setMonto(e.target.value)}
+                required
+              />
+            </div>
 
-          <input type="file" className="form-control mb-2"
-            onChange={(e) => setFactura(e.target.files[0])} />
+            <div className="mb-3">
+              <label className="form-label">Fecha</label>
+              <input
+                type="date"
+                className="form-control"
+                value={fecha}
+                onChange={(e) => setFecha(e.target.value)}
+                required
+              />
+            </div>
 
-          <button className="btn btn-success">Guardar</button>
-        </form>
+            <div className="mb-3">
+              <label className="form-label">Factura</label>
+              <input
+                type="file"
+                className="form-control"
+                accept="image/*"
+                onChange={(e) => setFactura(e.target.files[0])}
+                required
+              />
+            </div>
+
+            <button className="btn btn-success w-100" type="submit">
+              Guardar entrada
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
     </>
   );
 }

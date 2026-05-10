@@ -30,7 +30,7 @@ function Dashboard() {
 
   const cargarDatos = async () => {
     try {
-      const response = await api.get("/balance.php");
+      const response = await api.get(`/balance.php?usuario_id=${usuario.id}`);
       setDatos(response.data);
     } catch (error) {
       console.error("Error al cargar dashboard:", error);
@@ -48,9 +48,6 @@ function Dashboard() {
     ]
   };
 
-  const ultimasEntradas = datos.entradas.slice(0, 3);
-  const ultimasSalidas = datos.salidas.slice(0, 3);
-
   return (
     <>
       <Navbar />
@@ -61,12 +58,12 @@ function Dashboard() {
             <span className="home-badge">Panel principal</span>
             <h1>Bienvenido, {usuario?.nombre_completo}</h1>
             <p>
-              Gestiona tus entradas, salidas, facturas y reportes financieros
-              desde un solo lugar.
+              Gestiona tus entradas, salidas, facturas y reportes financieros.
             </p>
           </div>
 
           <button
+            type="button"
             className="btn btn-light btn-lg-modern"
             onClick={() => navigate("/balance")}
           >
@@ -100,6 +97,7 @@ function Dashboard() {
 
             <div className="quick-actions">
               <button
+                type="button"
                 className="quick-btn green"
                 onClick={() => navigate("/entrada")}
               >
@@ -108,6 +106,7 @@ function Dashboard() {
               </button>
 
               <button
+                type="button"
                 className="quick-btn red"
                 onClick={() => navigate("/salida")}
               >
@@ -116,6 +115,7 @@ function Dashboard() {
               </button>
 
               <button
+                type="button"
                 className="quick-btn blue"
                 onClick={() => navigate("/ver-entradas")}
               >
@@ -124,6 +124,7 @@ function Dashboard() {
               </button>
 
               <button
+                type="button"
                 className="quick-btn orange"
                 onClick={() => navigate("/ver-salidas")}
               >
@@ -132,6 +133,7 @@ function Dashboard() {
               </button>
 
               <button
+                type="button"
                 className="quick-btn dark"
                 onClick={() => navigate("/balance")}
               >
@@ -147,62 +149,6 @@ function Dashboard() {
             <div className="home-chart">
               <Pie data={dataChart} />
             </div>
-          </div>
-        </section>
-
-        <section className="home-main-grid">
-          <div className="home-panel">
-            <h4>Últimas entradas</h4>
-
-            {ultimasEntradas.length === 0 ? (
-              <p className="text-muted">No hay entradas registradas.</p>
-            ) : (
-              <table className="table table-sm">
-                <thead>
-                  <tr>
-                    <th>Tipo</th>
-                    <th>Monto</th>
-                    <th>Fecha</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ultimasEntradas.map((e) => (
-                    <tr key={e.id}>
-                      <td>{e.tipo_entrada}</td>
-                      <td>${Number(e.monto).toFixed(2)}</td>
-                      <td>{e.fecha}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-
-          <div className="home-panel">
-            <h4>Últimas salidas</h4>
-
-            {ultimasSalidas.length === 0 ? (
-              <p className="text-muted">No hay salidas registradas.</p>
-            ) : (
-              <table className="table table-sm">
-                <thead>
-                  <tr>
-                    <th>Tipo</th>
-                    <th>Monto</th>
-                    <th>Fecha</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ultimasSalidas.map((s) => (
-                    <tr key={s.id}>
-                      <td>{s.tipo_salida}</td>
-                      <td>${Number(s.monto).toFixed(2)}</td>
-                      <td>{s.fecha}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
           </div>
         </section>
       </div>

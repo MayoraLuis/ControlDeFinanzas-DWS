@@ -9,11 +9,12 @@ class Salida {
         $this->conn = $db->conectar();
     }
 
-    public function registrar($tipo, $monto, $fecha, $factura) {
-        $sql = "INSERT INTO salidas (tipo_salida, monto, fecha, factura)
-                VALUES (:tipo, :monto, :fecha, :factura)";
-        
+    public function registrar($usuario_id, $tipo, $monto, $fecha, $factura) {
+        $sql = "INSERT INTO salidas (usuario_id, tipo_salida, monto, fecha, factura)
+                VALUES (:usuario_id, :tipo, :monto, :fecha, :factura)";
+
         $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(":usuario_id", $usuario_id);
         $stmt->bindParam(":tipo", $tipo);
         $stmt->bindParam(":monto", $monto);
         $stmt->bindParam(":fecha", $fecha);

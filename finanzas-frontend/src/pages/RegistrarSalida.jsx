@@ -14,14 +14,31 @@ function RegistrarSalida() {
     e.preventDefault();
     setMensaje("");
 
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+    if (!usuario || !usuario.id) {
+      setMensaje("No se encontró el usuario logueado. Inicia sesión nuevamente.");
+      return;
+    }
+
+    if (!factura) {
+      setMensaje("Debes seleccionar una factura.");
+      return;
+    }
+
     const formData = new FormData();
+    formData.append("usuario_id", usuario.id);
     formData.append("tipo_salida", tipo);
     formData.append("monto", monto);
     formData.append("fecha", fecha);
     formData.append("factura", factura);
 
     try {
-      const response = await api.post("/crear_salida.php", formData);
+      const response = await api.post("/crear_salida.php", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       if (response.data.success) {
         setMensaje("Salida registrada correctamente");
@@ -34,6 +51,7 @@ function RegistrarSalida() {
         setMensaje(response.data.message || "Error al guardar la salida");
       }
     } catch (error) {
+      console.error(error);
       setMensaje("Error al conectar con el servidor");
     }
   };
